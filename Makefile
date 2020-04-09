@@ -9,7 +9,7 @@ BINARY_SHELL=shell
 FLAGS="-s -w"
 
 # Client Settings
-URL=https://localhost:8443/tienda/peluche
+URL=https://172.16.30.120:8443/tienda/peluche
 SECRET=superChief
 COMMS=10
 FLEX=2
@@ -36,11 +36,11 @@ build_server:
 build_shell:
 	cd shell; $(GOBUILD) -o $(BINARY_SHELL) -v -ldflags $(FLAGS); cd ../
 build_linux64:
-	cd client; GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(BINARY_CLIENT)_linux64 -v -ldflags $(LDFLAGS); cd ../
+	cd client; GOOS=linux GOARCH=amd64 $(GOBUILD) -o $(NODE)_linux64 -v -ldflags $(LDFLAGS); cd ../
 build_mips:
-	cd client; GOOS=linux GOARCH=mips $(GOBUILD) -o $(BINARY_CLIENT)_mips -v -ldflags $(LDFLAGS); cd ../
+	cd client; GOOS=linux GOARCH=mips $(GOBUILD) -o $(NODE)_mips -v -ldflags $(LDFLAGS); cd ../
 build_ppc:
-	cd client; GOOS=linux GOARCH=ppc64 $(GOBUILD) -o $(BINARY_CLIENT)_ppc -v -ldflags $(LDFLAGS); cd ../
+	cd client; GOOS=linux GOARCH=ppc64 $(GOBUILD) -o $(NODE)_ppc -v -ldflags $(LDFLAGS); cd ../
 build_arm:
 	cd client; GOOS=linux GOARCH=arm GOARM=7 $(GOBUILD) -o $(NODE)_arm -v -ldflags $(LDFLAGS); cd ../
 build_linux32:
