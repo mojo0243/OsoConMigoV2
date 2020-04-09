@@ -1,0 +1,8 @@
+# Database configuration
+database:
+  host: "localhost"
+  port: 5432
+  user: "test"
+  pass: "pass"
+  name: "oso"
+  mode: "disable"

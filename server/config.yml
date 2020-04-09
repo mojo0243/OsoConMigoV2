@@ -1,0 +1,19 @@
+# Database configuration
+database:
+  host: "localhost"
+  port: 5432
+  user: "test"
+  pass: "pass"
+  name: "oso"
+  mode: "disable"
+
+# Server configuration
+server:
+  ip       : "0.0.0.0"
+  port     : "8443"
+  uri      : "/tienda/peluche"
+  secret   : "superChief"
+  cert     : "./cert/server.crt"
+  key      : "./cert/server.key"
+  in       : "./panda"
+  out      : "./koala"
