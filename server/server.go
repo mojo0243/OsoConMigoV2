@@ -40,12 +40,12 @@ type Config struct {
 		Out	string `yaml:"out"`
 	} `yaml:"server"`
 	Database struct {
-		Dbhost 	string 	`yaml:"host"`
-		Dbport 	int	`yaml:"port"`
-		Dbuser 	string	`yaml:"user"`
-		Dbpass 	string 	`yaml:"pass"`
-		Dbname 	string 	`yaml:"name"`
-		Dbmode 	string 	`yaml:"mode"`
+		Dbhost 	string `yaml:"host"`
+		Dbport 	int	  `yaml:"port"`
+		Dbuser 	string `yaml:"user"`
+		Dbpass 	string `yaml:"pass"`
+		Dbname 	string `yaml:"name"`
+		Dbmode 	string `yaml:"mode"`
 	} `yaml:"database"`
 }
 
@@ -53,11 +53,11 @@ type Config struct {
 type ClientIdentity struct {
 	Id 		int 	`db:"id"`
 	Node 		string 	`db:"node"`
-	Arch 		string 	`db:"arch"`
+	Arch 	string 	`db:"arch"`
 	Os 		string 	`db:"os"`
 	Secret          string  `db:"secret"`
-	Comms        	int	`db:"comms"`
-	Flex         	int   	`db:"flex"`
+	Comms        int	`db:"comms"`
+	Flex          int   	`db:"flex"`
 	FirstSeen 	int64 	`db:"firstSeen"`
 	LastSeen 	int64 	`db:"lastSeen"`
 }
@@ -439,7 +439,7 @@ func AddNewClient(a string, s string, ar string, o string, c int, j int) {
 	t := "INSERT INTO clients (node,arch,os,secret,comms,flex,firstSeen,lastSeen) VALUES ('%s', '%s', '%s', '%s', %d, %d, %d, %d)"
 	command := fmt.Sprintf(t, a, ar, o, s, c, j, GetCurrentEpoch(), GetCurrentEpoch())
 	exec(command)
-	fmt.Printf("[+] New client checked in: %s", a)
+	fmt.Printf("[+] New client checked in: %s\n", a)
 }
 
 // Get client tasks
@@ -637,7 +637,7 @@ func createTaskSchema() {
         CREATE TABLE IF NOT EXISTS tasks (
           id SERIAL PRIMARY KEY,
           node TEXT,
-   	  job SERIAL UNIQUE,
+   	      job SERIAL UNIQUE,
           command TEXT,
           status TEXT,
           taskDate INTEGER,

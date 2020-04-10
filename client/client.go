@@ -29,7 +29,7 @@ var comms string
 var flex string
 var url string
 
-// Define a global agent to allow runtime updates
+// Define a global client to allow runtime updates
 var a Client
 
 // Client settings struct
@@ -90,7 +90,7 @@ func main() {
 		os.Exit(3)
 	}
 
-	// Get agent configuration
+	// Get client configuration
 	configClient(*cert)
 
 	// Start polling

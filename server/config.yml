@@ -9,11 +9,11 @@ database:
 
 # Server configuration
 server:
-  ip       : "0.0.0.0"
-  port     : "8443"
+  ip       : "127.0.0.1"
+  port     : "8442"
   uri      : "/tienda/peluche"
   secret   : "superChief"
   cert     : "./cert/server.crt"
   key      : "./cert/server.key"
-  in       : "./panda"
-  out      : "./koala"
+  in       : "./koala"
+  out      : "./panda"
