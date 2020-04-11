@@ -8,7 +8,7 @@ BINARY_SHELL=shell
 FLAGS="-s -w"
 
 # Client Settings
-URL=https://192.168.1.3:8442/tienda/peluche
+URL=https://192.168.1.3:8443/tienda/peluche
 SECRET=superChief
 COMMS=5
 FLEX=1
@@ -42,7 +42,7 @@ build_ppc:
 	cd client; GOOS=linux GOARCH=ppc64 $(GOBUILD) -o $(NODE)_ppc -v -ldflags $(LDFLAGS); cd ../
 build_arm:
 	cd client; GOOS=linux GOARCH=arm GOARM=7 $(GOBUILD) -o $(NODE)_arm -v -ldflags $(LDFLAGS); cd ../
-build_netgear:
+build_r6400:
 	cd client; GOOS=linux GOARCH=arm $(GOBUILD) -o $(NODE)_netgear -v -ldflags $(LDFLAGS); cd ../
 
 deps:
