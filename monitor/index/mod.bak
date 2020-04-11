@@ -1,0 +1,34 @@
+from datetime import datetime
+from index import db
+from flask_login import UserMixin
+
+# Create Database structure
+
+class clients(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	node = db.Column(db.Text, unique=True)
+	arch = db.Column(db.Text)
+	os = db.Column(db.Text)
+	secret = db.Column(db.Text)
+	comms = db.Column(db.Integer)
+	flex = db.Column(db.Integer)
+	firstseen = db.Column(db.Integer)
+	lastseen = db.Column(db.Integer)
+
+class tasks(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	node = db.Column(db.Text)
+	job = db.Column(db.Integer, unique=True)
+	command = db.Column(db.Text)
+	status = db.Column(db.Text)
+	taskdate = db.Column(db.Integer)
+	completedate = db.Column(db.Integer)
+	complete = db.Column(db.Boolean)
+	
+class results(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	node = db.Column(db.Text)
+	jobid = db.Column(db.Integer)
+	output = db.Column(db.Text)
+	completedate = db.Column(db.Integer)
+

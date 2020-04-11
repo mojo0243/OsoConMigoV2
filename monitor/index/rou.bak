@@ -1,0 +1,39 @@
+import time, os, datetime, cmd, logging
+from datetime import date
+from flask import render_template, url_for, flash, redirect, request, abort, make_response, jsonify, send_file
+from index.models import clients, tasks, results
+from index import app, db, bcrypt
+from flask_login import login_user, current_user, logout_user, login_required
+
+# Create Custom Logs for Node Check Ins
+
+@app.after_request
+def log_file_format(response):
+	if request.path == '/':
+		return response
+	elif request.path == '/login':
+		return response
+	elif request.path == '/create-user':
+		return response
+	elif request.path == "/logout":
+		return response
+	elif request.path.startswith('/static'):
+		return response
+	elif request.path.startswith('/js'):
+		return response
+	else:
+		return abort(404)
+
+# Define responses for requested URLs
+
+@app.errorhandler(404)
+def not_found(error):
+	return make_response(jsonify({'error': 'Not found'}), 404)
+
+@app.route("/", methods=['GET', 'POST'])
+def index():
+	tgts = clients.query.all()
+	alrts = clients.query.order_by(clients.lastseen.desc()).limit(8).all()
+	jbs = tasks.query.order_by(tasks.id.desc()).limit(20).all()
+	rslts = results.query.order_by(results.id.desc()).limit(20).all()
+	return render_template('main.html', tgts=tgts, alrts=alrts, jbs=jbs, rslts=rslts)

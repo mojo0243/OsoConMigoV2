@@ -1,0 +1,44 @@
+.title{
+	padding-top: 75px;
+	height: 150px;
+}
+
+.top{
+	height: 300px;
+}
+
+.rbord{
+	border-right: 1px groove;
+}
+
+.bbord{
+	border-bottom: 1px groove;
+	border-top: 1px groove;
+}
+
+.min-size{
+	min-height: 400px;
+}
+
+.tab{
+	padding-right: 25px;
+}
+
+h4{
+	padding-top: 15px;
+	text-align: center;
+}
+
+h6{
+	text-align: center;
+	font-family: Impact, sans, monospace;
+	font-weight: bold;
+}
+
+.lmar{
+	margin-left: 20px;
+}
+
+.rmar{
+	margin-right: 20px;
+}

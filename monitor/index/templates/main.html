@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+{% block content %}
+	<script>
+		setTimeout(function(){
+			window.location.reload(null, false);
+		}, 10000)
+	</script>
+	<div class="row bbord justify-content-center">
+		<div class="col-sm-4 lmar rbord">
+			<h4>Nodes</h4>
+			<table class="table table-striped table-hover table-dark">
+				<thead>
+					<tr>
+						<th scope="col">Node Number</th>
+						<th scope="col">Arch</th>
+						<th scope="col">Comms</th>
+						<th scope="col">Flex</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for tgt in tgts %}
+					<tr>
+						<td class="text-success">{{ tgt.node }}</td>
+						<td>{{ tgt.arch }}</td>
+						<td>{{ tgt.comms }}</td>
+						<td>{{ tgt.flex }}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+		<div class="col-sm-7 rmar">
+			<h4>Alerts</h4>
+			<table class="table table-striped table-hover table-dark">
+				<thead>
+					<tr>
+						<th scope="col">Node Number</th>
+						<th scope="col">OS</th>
+						<th scope="col">First Seen (epoch)</th>
+						<th scope="col">Last Seen (epoch)</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for tgt in tgts %}
+					<tr>
+						<td>{{ tgt.node }}</td>
+						<td>{{ tgt.os }}</td>
+						<td>{{ tgt.firstseen }}</td>
+						<td>{{ tgt.lastseen }}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-sm-12 rmar lmar">
+			<h4>Jobs</h4>
+			<table class="table table-striped table-hover table-dark">
+				<thead>
+					<tr>
+						<th scope="col">Node</th>
+						<th scope="col">Task #</th>
+						<th scope="col">Job</th>
+						<th scope="col">Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					{% for jb in jbs %}
+					<tr>
+						<td>{{ jb.node }}</td>
+						<td>{{ jb.job }}</td>
+						<td>{{ jb.command }}</td>
+						<td>{{ jb.complete }}</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{% endblock content %}
