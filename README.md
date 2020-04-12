@@ -1,4 +1,4 @@
-#OsoConMigo Version 2.0
+# OsoConMigo Version 2.0
 
 [![Generic badge](https://img.shields.io/badge/Go-v1.14-blue.svg)](https://shields.io/) [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/Naereen/StrapDown.js/blob/master/LICENSE)
 
@@ -63,7 +63,7 @@ Edit the Make file to include the IP for your server and any client specific inf
 go tool dist list
 ```
 
-Generic build instructions with make
+#### Generic build instructions with make
 ```
 cd OsoConMigoV2
 
@@ -113,7 +113,7 @@ screen -S Oso_Server
  screen -x Oso_Server
 ```
 
-Start the Shell
+#### Start the Shell
 ```
 cd shell
 ./shell -c config.yml
@@ -155,7 +155,7 @@ DROP TABLE agents,results,tasks,tokens;
 ```
 
 #### Basic usage
-````
+```
 clients					: List available clients
 client <node>				: Tag into client for interaction.  client without a name brings the user back to home and lists clients.
 task <command>				: Task the client to execute a command. Must start with shell. Ex: /bin/bash, /bin/sh, cmd.exe

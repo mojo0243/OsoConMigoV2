@@ -8,7 +8,7 @@ BINARY_SHELL=shell
 FLAGS="-s -w"
 
 # Client Settings
-URL=https://192.168.1.3:8443/tienda/peluche
+URL=https://localhost:8443/tienda/peluche
 SECRET=superChief
 COMMS=5
 FLEX=1
