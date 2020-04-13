@@ -2,13 +2,14 @@
 GOCMD=go
 GOBUILD=$(GOCMD) build
 GOCLEAN=$(GOCMD) clean
+GOGET=$(GOCMD) get
 BINARY_SERVER=server
 BINARY_CLIENT=client
 BINARY_SHELL=shell
 FLAGS="-s -w"
 
 # Client Settings
-URL=https://localhost:8443/tienda/peluche
+URL=http://192.168.1.3:8080/tasking/n2
 SECRET=superChief
 COMMS=5
 FLEX=1
