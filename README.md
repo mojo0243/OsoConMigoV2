@@ -7,7 +7,8 @@ OsoConMigo is in it's second version.  At the moment it is a simple beaconing im
 ## Getting Started
 
 #### Install dependencies (Debian and Ubuntu)
-``` Apt update && apt -y upgrade && apt -y install build-essential postgresql screen vim git upx
+```
+Apt update && apt -y upgrade && apt -y install build-essential postgresql screen vim git upx
 ```
 
 #### Install GO
