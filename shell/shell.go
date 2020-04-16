@@ -247,8 +247,12 @@ func executor(in string) {
 	case "forget":
 		if !checkLiveAndActive() && len(c) == 3 && strings.TrimSpace(c[1]) == "client" {
 			e := CheckClientExists(strings.TrimSpace(c[2]))
+			b := strings.TrimSpace(c[2])
 			if e {
-				forgetClient(active)
+				forgetClient1(b)
+				forgetClient2(b)
+				forgetClient3(b)
+				forgetClient4(b)
 			} else {
 				fmt.Println("[!] Client not found")
 			}
@@ -533,10 +537,28 @@ func RemoveJob(i int, n string) {
 	exec(command)
 }
 
-func forgetClient(n string) {
+func forgetClient1(n string) {
 	q := "DELETE FROM tasks,clients,tokens,results WHERE node='%s'"
 	command := fmt.Sprintf(q, n)
 	exec(command)
+}
+
+func forgetClient2(n string) {
+        q := "DELETE FROM clients WHERE node='%s'"
+        command := fmt.Sprintf(q, n)
+        exec(command)
+}
+
+func forgetClient3(n string) {
+        q := "DELETE FROM tokens WHERE node='%s'"
+        command := fmt.Sprintf(q, n)
+        exec(command)
+}
+
+func forgetClient4(n string) {
+        q := "DELETE FROM results WHERE node='%s'"
+        command := fmt.Sprintf(q, n)
+        exec(command)
 }
 
 // Show available clients
