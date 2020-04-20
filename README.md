@@ -182,6 +182,7 @@ eat					: Remove served tasks from default
 basket					: View any default tasks that have not been set to serve
 served					: View default tasks which will be picked up by any client on initial check in
 clear					: Clear all data from tasks, clients, results, defaults and tokens
+quit					: Exit the shell
 ```
 
 #### Web Interface monitor
