@@ -6,3 +6,8 @@ database:
   pass: "pass"
   name: "oso"
   mode: "disable"
+
+# Server configuration
+server:
+  in       : "../server/koala"
+

