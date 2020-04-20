@@ -1,4 +1,4 @@
-# OsoConMigo Version 2.0
+# OsoConMigo Version 2.1
 
 [![Generic badge](https://img.shields.io/badge/Go-v1.14-blue.svg)](https://shields.io/) [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/Naereen/StrapDown.js/blob/master/LICENSE)
 
@@ -77,8 +77,8 @@ make build_server
 # Build the shell
 make build_shell
 
-# Build a custom client (In this case for the Netgear R6400 which was the origination of this project)
-make build_r6400
+# Build a client with default settings
+make build_linux64
 
 # Make a custom client with and over ride Node name
 make build_mips NODE=M0001
@@ -173,25 +173,20 @@ jobs					: List complete and deployed jobs
 pull <remote file>			: Pulle a file from the target machine.
 push <local file> <remote file>		: Push a local file to the target machine.
 forget <node>				: Remove a client from the database
-dump client 				: Not yet implemented
-dump job				: Not yet implemented
+dump					: When tagged into a client with dump jobID:Node:Task:Result into the server out file (result will be base64 encoded)
+default					: Tag into the default command section
+cook					: When tagged into default type cook followed by any other standard commands to set default commands for initial client check ins
+trash					: Remove tasks from default that have not been served
+serve					: Set default tasks to be picked up on any initial check in by a client
+eat					: Remove served tasks from default
+basket					: View any default tasks that have not been set to serve
+served					: View default tasks which will be picked up by any client on initial check in
+clear					: Clear all data from tasks, clients, results, defaults and tokens
 ```
 
 #### Web Interface monitor
 
 This python script provides a simple web interface that allows the user to have a quick refernce for available nodes, first seen and last seen, along with status of jobs deployed.  Because this is written in python flask it is only recommended to run on the local host ip and use ssh for remote port forward if placing on a different computer.  This application requires a login for access.  Currently the /create-user page is not set to force a login for view.  This can be fixed by uncommenting the for lines on the index/routes.py file under the /create-user route.  If these lines are uncommented the only username which can access this page afterwards is admin.
-
-#### Create user database
-
-```
-# Login to shell
-sudo -u postgres psql
-
-# Connect to oso database
-\c oso
-
-CREATE TABLE users(id serial primary key, username string(20) unique not nul, password string(60) not null);
-```
 
 #### Setup the Web interface monitor
 
@@ -219,16 +214,9 @@ Open a browser and browse to http://127.0.0.1:8000/login
 
 #### TO DO
 
-1. Add Fix r6400 TLS handshake issue
+1. Add database column that indicates bool value for files.
 
-2. Add database column that indicates bool value for files.
+2. Write files pulled to out folder instead of database.  based on bool value. Preserve pull path
 
-3. Write files pulled to out folder instead of database.  based on bool value. Preserve pull path
+3. Add a scheduler option to run recuring commands at a given interval
 
-4. Add shell feature to dump client results and commands to disk
-
-5. Add shell command to wipe database
-
-6. Add a scheduler option to run recuring commands at a given interval
-
-7. Add a default option for commands for first check in from clients
