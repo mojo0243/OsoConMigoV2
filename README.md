@@ -185,6 +185,14 @@ clear					: Clear all data from tasks, clients, results, defaults and tokens
 quit					: Exit the shell
 ```
 
+#### Convert results in dump file from base64 to human readable
+
+The python script read_results.py takes two commands.  The -i and the -o commands. The -i is for the file you wish to read which as base64 from the dump command.  The -o is for where you want the results to be written to.
+
+```
+python3 read_results.py -i in.txt -o out.txt
+```
+
 #### Web Interface monitor
 
 This python script provides a simple web interface that allows the user to have a quick refernce for available nodes, first seen and last seen, along with status of jobs deployed.  Because this is written in python flask it is only recommended to run on the local host ip and use ssh for remote port forward if placing on a different computer.  This application requires a login for access.  Currently the /create-user page is not set to force a login for view.  This can be fixed by uncommenting the for lines on the index/routes.py file under the /create-user route.  If these lines are uncommented the only username which can access this page afterwards is admin.
